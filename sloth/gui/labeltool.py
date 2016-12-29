@@ -2,11 +2,12 @@
 import logging, os
 import functools
 import fnmatch
-from PyQt4.QtGui import QMainWindow, QSizePolicy, QWidget, QVBoxLayout, QAction,\
-        QKeySequence, QLabel, QItemSelectionModel, QMessageBox, QFileDialog, QFrame, \
-        QDockWidget, QProgressBar, QProgressDialog
-from PyQt4.QtCore import SIGNAL, QSettings, QSize, QPoint, QVariant, QFileInfo, QTimer, pyqtSignal, QObject
-import PyQt4.uic as uic
+from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QAction,\
+        QLabel, QMessageBox, QFileDialog, QFrame, \
+        QDockWidget, QProgressBar, QProgressDialog, QSizePolicy
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtCore import QSettings, QSize, QPoint, QVariant, QFileInfo, QTimer, pyqtSignal, QObject, QItemSelectionModel
+import PyQt5.uic as uic
 from sloth.gui import qrc_icons  # needed for toolbar icons
 from sloth.gui.propertyeditor import PropertyEditor
 from sloth.gui.annotationscene import AnnotationScene
@@ -106,7 +107,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Background loading finished", 5000)
         self.idletimer.stop()
         if self.loader is not None:
-            self.idletimer.timeout.disconnect(self.loader.load)
+            self.idletimer.timeout.disconnect()
             self.statusBar().removeWidget(self.sb_progress)
             self.loader = None
 
@@ -129,7 +130,7 @@ class MainWindow(QMainWindow):
 
         img = self.labeltool.getImage(new_image)
 
-        if img == None:
+        if img is None:
             self.controls.setFilename("")
             self.selectionmodel.setCurrentIndex(new_image.index(), QItemSelectionModel.ClearAndSelect|QItemSelectionModel.Rows)
             return
@@ -396,7 +397,7 @@ class MainWindow(QMainWindow):
             path = QFileInfo(filename).path()
 
         format_str = ' '.join(self.labeltool.getAnnotationFilePatterns())
-        fname = QFileDialog.getOpenFileName(self, 
+        fname, _ = QFileDialog.getOpenFileName(self, 
                 "%s - Load Annotations" % APP_NAME, path,
                 "%s annotation files (%s)" % (APP_NAME, format_str))
         if len(str(fname)) > 0:
@@ -411,7 +412,7 @@ class MainWindow(QMainWindow):
     def fileSaveAs(self):
         fname = '.'  # self.annotations.filename() or '.'
         format_str = ' '.join(self.labeltool.getAnnotationFilePatterns())
-        fname = QFileDialog.getSaveFileName(self,
+        fname, _ = QFileDialog.getSaveFileName(self,
                 "%s - Save Annotations" % APP_NAME, fname,
                 "%s annotation files (%s)" % (APP_NAME, format_str))
 
@@ -428,12 +429,12 @@ class MainWindow(QMainWindow):
         image_types = [ '*.jpg', '*.bmp', '*.png', '*.pgm', '*.ppm', '*.ppm', '*.tif', '*.gif' ]
         video_types = [ '*.mp4', '*.mpg', '*.mpeg', '*.avi', '*.mov', '*.vob' ]
         format_str = ' '.join(image_types + video_types)
-        fnames = QFileDialog.getOpenFileNames(self, "%s - Add Media File" % APP_NAME, path, "Media files (%s)" % (format_str, ))
+        fnames, _ = QFileDialog.getOpenFileNames(self, "%s - Add Media File" % APP_NAME, path, "Media files (%s)" % (format_str, ))
 
         item = None
         numFiles = len(fnames)
         progress_bar = QProgressDialog('Importing files...', 'Cancel import', 0, numFiles, self)
-        for fname,c in zip(fnames, range(numFiles)):
+        for fname, c in zip(fnames, range(numFiles)):
             if len(str(fname)) == 0:
                 continue
 
@@ -448,7 +449,7 @@ class MainWindow(QMainWindow):
             
             progress_bar.setValue(c)
 
-        if item is None:
+        if item is None and numFiles > 0:
             return self.labeltool.addVideoFile(fname)
 
         progress_bar.close()

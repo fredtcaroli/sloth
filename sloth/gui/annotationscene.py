@@ -233,6 +233,8 @@ class AnnotationScene(QGraphicsScene):
         self.editSelectedItems()
 
     def onSelectionChangedInTreeView(self, model_items):
+        if self._labeltool.propertyeditor() is None: #main window not loaded
+            return
         block = self.blockSignals(True)
         selected_items = set()
         for model_item in model_items:
