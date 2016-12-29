@@ -1,5 +1,7 @@
-sloth
+sloth - PyQt5 port
 =====
+
+sloth port to use PyQt5
 
 [![Build Status](https://travis-ci.org/cvhciKIT/sloth.svg)](https://travis-ci.org/cvhciKIT/sloth)
 
