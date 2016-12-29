@@ -233,8 +233,6 @@ class AnnotationScene(QGraphicsScene):
         self.editSelectedItems()
 
     def onSelectionChangedInTreeView(self, model_items):
-        if self._labeltool.propertyeditor() is None: #main window not loaded
-            return
         block = self.blockSignals(True)
         selected_items = set()
         for model_item in model_items:
@@ -252,7 +250,9 @@ class AnnotationScene(QGraphicsScene):
         scene_items = self.selectedItems()
         if self._inserter is None or len(scene_items) > 0:
             items = [item.modelItem() for item in scene_items]
-            self._labeltool.propertyeditor().startEditMode(items)
+            editor = self._labeltool.propertyeditor()
+            if not editor is None: #main window loaded
+                editor.startEditMode(items)
 
     #
     # key event handlers
